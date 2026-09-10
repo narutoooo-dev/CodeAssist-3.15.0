@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  JAVA_VERSION: "17"          # ← تعديل 1
+  JAVA_VERSION: "17"
 
 concurrency:
   group: apk-${{ github.ref }}
@@ -32,7 +32,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: "platform-tools platforms;android-36 build-tools;36.0.0"   # ← تعديل 2
+          packages: "platform-tools platforms;android-36 build-tools;36.0.0"
 
       - name: Disable Kotlin incremental compilation (CI)
         run: |
@@ -42,16 +42,12 @@ jobs:
       - name: Build debug APK
         run: ./gradlew :ide-android:assembleDebug --console=plain --stacktrace
 
-      - name: Debug - list all APKs
-        if: always()                                                             # ← تعديل 3
-        run: find . -name "*.apk" -type f -not -path "*/\.gradle/*"
-
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: codeassist-debug-apk
-          path: ide-android/build/outputs/apk/debug/*.apk                      # ← تعديل 4
-          if-no-files-found: warn                                              # ← تعديل 5
+          path: app/ide-android/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
           retention-days: 30
 
   build-release:
@@ -72,7 +68,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: "platform-tools platforms;android-36 build-tools;36.0.0"   # ← تعديل 2
+          packages: "platform-tools platforms;android-36 build-tools;36.0.0"
 
       - name: Disable Kotlin incremental compilation (CI)
         run: |
@@ -100,14 +96,10 @@ jobs:
       - name: Build release APK
         run: ./gradlew :ide-android:assembleRelease --console=plain --stacktrace
 
-      - name: Debug - list all APKs
-        if: always()                                                             # ← تعديل 3
-        run: find . -name "*.apk" -type f -not -path "*/\.gradle/*"
-
       - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
           name: codeassist-release-apk
-          path: ide-android/build/outputs/apk/release/*.apk                    # ← تعديل 4
-          if-no-files-found: warn                                              # ← تعديل 5
+          path: app/ide-android/build/outputs/apk/release/*.apk
+          if-no-files-found: error
           retention-days: 30
